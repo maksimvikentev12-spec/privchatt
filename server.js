@@ -1,4 +1,4 @@
-// Приватка: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
+// NuzaGram: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
 // Запуск: BOT_TOKEN=токен_от_BotFather node server.js
 const http = require('http'), fs = require('fs'), crypto = require('crypto');
 
@@ -283,9 +283,9 @@ poll();
 const PAGE = String.raw`<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark"><title>Приватка</title><link rel="icon" id="fav" href="data:,">
+<meta name="color-scheme" content="dark"><title>NuzaGram</title><link rel="icon" id="fav" href="data:,">
 <style>
-:root{--bg:#181818;--field:#1e1e1e;--card:#232323;--line:#4a4a4a;--text:#f2f2f2;--mute:#8a8a8a;--accent:#86b055;--mine:#3d5a2a;--err:#e0685f;--fs:16px;--br:17px;--wall:#181818;--nav:#222;--navon:#2c3626;--sheet:#202020;--bd:#333}
+:root{--bg:#17212b;--field:#232e3c;--card:#232e3c;--line:#101921;--text:#ffffff;--mute:#708499;--accent:#5ca1e6;--mine:#2b5278;--err:#e0685f;--fs:16px;--br:12px;--wall:#0e1621;--nav:#17212b;--navon:#232e3c;--sheet:#17212b;--bd:#101921}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px)}
@@ -315,11 +315,11 @@ h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 #app.on{display:block}
 .tab{display:none;height:100%;flex-direction:column}
 .tab.on{display:flex}
-.top{display:flex;align-items:center;gap:10px;padding:12px 16px;min-height:64px}
-.top h2{flex:1;margin:0;font-size:24px;font-weight:600}
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;min-height:56px}
+.top h2{flex:1;margin:0;font-size:20px;font-weight:600}
 .ico{background:var(--card);border:0;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
 .sbox{flex:1;background:var(--card);border:0;border-radius:22px;padding:12px 16px;color:var(--text);font-size:17px;outline:0;min-width:0}
-.scroll{flex:1;overflow:auto;padding:0 8px 130px}
+.scroll{flex:1;overflow:auto;padding:0 8px 85px}
 .row{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;padding:10px 8px;text-align:left;cursor:pointer;border-radius:14px}
 .row:active{background:var(--card)}
 .ava{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:600;flex:none;color:#fff;position:relative}
@@ -330,10 +330,10 @@ h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 .btn{background:var(--accent);color:#14210a;border:0;border-radius:18px;padding:8px 14px;font-weight:600;cursor:pointer;flex:none}
 .sec{color:var(--accent);font-size:14px;padding:14px 10px 4px}
 .empty{color:var(--mute);text-align:center;padding:60px 30px;line-height:1.5;white-space:pre-line}
-.fab{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:3}
-.nav{position:absolute;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:2px;background:var(--nav);border-radius:34px;padding:6px;z-index:3}
-.nav button{flex:1;background:none;border:0;border-radius:28px;padding:9px 2px 8px;color:var(--text);font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
-.nav button.on{background:var(--navon);color:var(--accent)}
+.fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 85px);width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:3}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;gap:2px;background:var(--nav);border-top:1px solid var(--line);padding:6px 6px calc(env(safe-area-inset-bottom,0px) + 6px);z-index:3;max-width:560px;margin:0 auto}
+.nav button{flex:1;background:none;border:0;padding:6px 2px;color:var(--mute);font-size:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav button.on{color:var(--accent)}
 .nav .ni{height:26px;display:grid;place-items:center}
 /* профиль и настройки */
 .page{flex:1;overflow:auto;padding:0 14px 130px}
@@ -465,7 +465,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px;margin:6px 0
 
 <div id="app">
  <section class="tab on" id="tChats">
-  <div class="top" id="topNormal"><h2>Приватка</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
+  <div class="top" id="topNormal"><h2>NuzaGram</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
   <div class="top hide" id="topSearch"><button class="ico" id="sBack" aria-label="Закрыть поиск"></button><input class="sbox" id="sInp" placeholder="Поиск людей, групп и каналов" autocomplete="off"></div>
   <div class="scroll" id="chatList"></div>
   <div class="scroll hide" id="searchRes"></div>
