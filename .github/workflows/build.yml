@@ -10,23 +10,54 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
     - name: Build APK
       run: |
-        echo "y" | sdkmanager --licenses > /dev/null 2>&1 || true
+        # 1. Скачиваем нужную версию Gradle (7.5) и распаковываем её
+        wget -q https://services.gradle.org/distributions/gradle-7.5-bin.zip
+        unzip -q gradle-7.5-bin.zip
+        
+        # 2. Создаем структуру папок
         mkdir -p app/src/main/java/com/nuza/app
         
-        # Создаем манифест
-        echo '<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nuza.app"><uses-permission android:name="android.permission.INTERNET" /><application android:allowBackup="true" android:icon="@android:drawable/sym_def_app_icon" android:label="NuzaGram" android:theme="@android:style/Theme.NoTitleBar"><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter></activity></application></manifest>' > app/src/main/AndroidManifest.xml
+        # 3. Создаем манифест
+        cat << 'EOF' > app/src/main/AndroidManifest.xml
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.nuza.app">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <application android:allowBackup="true" android:icon="@android:drawable/sym_def_app_icon" android:label="NuzaGram" android:theme="@android:style/Theme.NoTitleBar">
+                <activity android:name=".MainActivity" android:exported="true">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+                        <category android:name="android.intent.category.LAUNCHER" />
+                    </intent-filter>
+                </activity>
+            </application>
+        </manifest>
+        EOF
         
-        # Создаем MainActivity.java
-        echo 'package com.nuza.app; import android.app.Activity; import android.os.Bundle; import android.webkit.WebView; import android.webkit.WebViewClient; public class MainActivity extends Activity { @Override protected void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); WebView webView = new WebView(this); webView.getSettings().setJavaScriptEnabled(true); webView.getSettings().setDomStorageEnabled(true); webView.setWebViewClient(new WebViewClient()); webView.loadUrl("https://nuzagram.onrender.com"); setContentView(webView); } }' > app/src/main/java/com/nuza/app/MainActivity.java
+        # 4. Создаем MainActivity.java
+        cat << 'EOF' > app/src/main/java/com/nuza/app/MainActivity.java
+        package com.nuza.app;
+        import android.app.Activity;
+        import android.os.Bundle;
+        import android.webkit.WebView;
+        import android.webkit.WebViewClient;
+        public class MainActivity extends Activity {
+            @Override
+            protected void onCreate(Bundle savedInstanceState) {
+                super.onCreate(savedInstanceState);
+                WebView webView = new WebView(this);
+                webView.getSettings().setJavaScriptEnabled(true);
+                webView.getSettings().setDomStorageEnabled(true);
+                webView.setWebViewClient(new WebViewClient());
+                webView.loadUrl("https://nuzagram.onrender.com");
+                setContentView(webView);
+            }
+        }
+        EOF
         
-        # Создаем конфигурационные файлы
-        echo "sdk.dir=$ANDROID_HOME" > local.properties
-        echo "include ':app'" > settings.gradle
-        echo "android.useAndroidX=true" > gradle.properties
-        
-        # ГЛАВНЫЙ ФАЙЛ build.gradle
+        # 5. Создаем build.gradle (корневой)
         cat << 'EOF' > build.gradle
         buildscript {
             repositories { google(); mavenCentral() }
@@ -35,7 +66,7 @@ jobs:
         allprojects { repositories { google(); mavenCentral() } }
         EOF
         
-        # ФАЙЛ app/build.gradle (тут была ошибка, теперь всё правильно)
+        # 6. Создаем app/build.gradle
         cat << 'EOF' > app/build.gradle
         apply plugin: 'com.android.application'
         android {
@@ -48,12 +79,16 @@ jobs:
                 versionCode 1
                 versionName "1.0"
             }
-            buildTypes { release { minifyEnabled false } }
         }
         EOF
         
-        gradle wrapper --gradle-version 7.5
-        ./gradlew assembleDebug
+        # 7. Создаем настройки
+        echo "sdk.dir=$ANDROID_HOME" > local.properties
+        echo "include ':app'" > settings.gradle
+        echo "android.useAndroidX=true" > gradle.properties
+        
+        # 8. Запускаем сборку через скачанный Gradle 7.5
+        ./gradle-7.5/bin/gradle assembleDebug
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
