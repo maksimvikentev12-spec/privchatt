@@ -285,7 +285,7 @@ const PAGE = String.raw`<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark"><title>NuzaGram</title><link rel="icon" id="fav" href="data:,">
 <style>
-:root{--bg:#17212b;--field:#232e3c;--card:#232e3c;--line:#101921;--text:#ffffff;--mute:#708499;--accent:#5ca1e6;--mine:#2b5278;--err:#e0685f;--fs:16px;--br:12px;--wall:#0e1621;--nav:#17212b;--navon:#232e3c;--sheet:#17212b;--bd:#101921}
+:root{--bg:#17212b;--field:#232e3c;--card:#232e3c;--line:#101921;--text:#ffffff;--mute:#708499;--accent:#5ca1e6;--mine:#2b5278;--err:#e0685f;--fs:15px;--br:12px;--wall:#0e1621;--nav:#17212b;--navon:#232e3c;--sheet:#17212b;--bd:#101921}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -310,10 +310,10 @@ h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 .rt{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rs{color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .rr{color:var(--mute);font-size:13px;flex:none}
-.fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);width:56px;height:56px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.3);z-index:3}
-.nav{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 15px);display:flex;background:var(--nav);border-radius:30px;padding:6px 8px;z-index:3;max-width:450px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.4)}
-.nav button{flex:1;background:none;border:0;border-radius:20px;padding:8px 2px;color:var(--mute);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:0.2s}
-.nav button.on{color:var(--accent);background:var(--navon)}
+.fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.3);z-index:3}
+.nav{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;background:var(--nav);border-radius:30px;padding:6px 10px;z-index:3;max-width:440px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.5);align-items:center;}
+.nav button{flex:1;background:none;border:0;border-radius:20px;padding:8px 2px;color:var(--mute);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:0.2s;}
+.nav button.on{color:var(--accent);background:var(--navon);}
 .page{flex:1;overflow:auto;padding:0 0 85px}
 .hero{text-align:center;padding:20px 0 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
 .hero .ava{width:100px;height:100px;font-size:40px;margin:0 auto 14px}
