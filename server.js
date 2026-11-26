@@ -661,6 +661,40 @@ function loadProfile(){loadMe(function(m){if(!m||m.error)return;var b=$("profBox
  if(m.bio)card.appendChild(kv(m.bio,"О себе"));
  b.appendChild(card);
   
+  var pr = h("div", "card");
+  pr.innerHTML = '<div class="srow"><div class="si" style="background:#8e7cc3">⭐</div><div class="rb"><div class="rt">Telegram Premium</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f0a030">🌟</div><div class="rb"><div class="rt">Звёзды Telegram</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#e85a5a">🏪</div><div class="rb"><div class="rt">Telegram для бизнеса</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f08a30">🎁</div><div class="rb"><div class="rt">Отправить подарок</div></div></div>';
+  pr.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(pr);
+
+  var hlp = h("div", "card");
+  hlp.innerHTML = '<div style="color:var(--accent);font-size:14px;padding:14px 0 4px">Помощь</div>' +
+                  '<div class="srow"><div class="si" style="background:#f0a030">💬</div><div class="rb"><div class="rt">Задать вопрос</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#5ca1e6">❓</div><div class="rb"><div class="rt">Вопросы о Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#a45be0">💡</div><div class="rb"><div class="rt">Возможности Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#3ab54a">🛡️</div><div class="rb"><div class="rt">Политика конфиденциальности</div></div></div>';
+  hlp.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(hlp);
+  
+  var pr = h("div", "card");
+  pr.innerHTML = '<div class="srow"><div class="si" style="background:#8e7cc3">⭐</div><div class="rb"><div class="rt">Telegram Premium</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f0a030">🌟</div><div class="rb"><div class="rt">Звёзды Telegram</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#e85a5a">🏪</div><div class="rb"><div class="rt">Telegram для бизнеса</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f08a30">🎁</div><div class="rb"><div class="rt">Отправить подарок</div></div></div>';
+  pr.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(pr);
+
+  var hlp = h("div", "card");
+  hlp.innerHTML = '<div style="color:var(--accent);font-size:14px;padding:14px 0 4px">Помощь</div>' +
+                  '<div class="srow"><div class="si" style="background:#f0a030">💬</div><div class="rb"><div class="rt">Задать вопрос</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#5ca1e6">❓</div><div class="rb"><div class="rt">Вопросы о Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#a45be0">💡</div><div class="rb"><div class="rt">Возможности Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#3ab54a">🛡️</div><div class="rb"><div class="rt">Политика конфиденциальности</div></div></div>';
+  hlp.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(hlp);
+  
   // Telegram Premium и остальное
   
   
