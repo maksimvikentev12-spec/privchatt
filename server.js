@@ -1,4 +1,4 @@
-// NuzaGram: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
+// Приватка: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
 // Запуск: BOT_TOKEN=токен_от_BotFather node server.js
 const http = require('http'), fs = require('fs'), crypto = require('crypto');
 
@@ -206,21 +206,6 @@ async function api(req, res, path, q, me) {
     return send(res, 200, { ok: true });
   }
 
-  if (get && path === '/api/devices') {
-    const cur = req.headers['x-token'];
-    return send(res, 200, Object.keys(db.sessions).filter(t => db.sessions[t] === me).map(t => ({
-      id: t.slice(0, 12), cur: t === cur,
-      ua: ((db.devs || {})[t] || {}).ua || '', t: ((db.devs || {})[t] || {}).t || 0
-    })).sort((a, b) => (b.cur - a.cur) || (b.t - a.t)));
-  }
-  if (path === '/api/devices/end') {
-    const cur = req.headers['x-token'];
-    for (const t of Object.keys(db.sessions))
-      if (db.sessions[t] === me && t !== cur && (body.all || t.slice(0, 12) === String(body.id || ''))) {
-        delete db.sessions[t]; if (db.devs) delete db.devs[t];
-      }
-    save(); return send(res, 200, { ok: true });
-  }
   send(res, 404, { error: 'Не найдено.' });
 }
 
@@ -262,7 +247,7 @@ http.createServer(async (req, res) => {
       delete codes[phone];
       const id = findByPhone(phone);
       const token = crypto.randomBytes(24).toString('hex');
-      db.sessions[token] = id; db.devs = db.devs || {}; db.devs[token] = { ua: String(req.headers['user-agent'] || '').slice(0, 300), t: Date.now() }; save();
+      db.sessions[token] = id; save();
       return send(res, 200, { ok: true, token, name: db.users[id].name });
     }
     if (path.startsWith('/api/')) {
@@ -283,71 +268,166 @@ poll();
 const PAGE = String.raw`<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark"><title>NuzaGram</title><link rel="icon" id="fav" href="data:,">
+<meta name="color-scheme" content="dark"><title>Приватка</title><link rel="icon" id="fav" href="data:,">
 <style>
-:root{--bg:#17212b;--field:#232e3c;--card:#232e3c;--line:#101921;--text:#ffffff;--mute:#708499;--accent:#5ca1e6;--mine:#2b5278;--err:#e0685f;--fs:15px;--br:12px;--wall:#0e1621;--nav:#17212b;--navon:#232e3c;--sheet:#17212b;--bd:#101921}
+:root{--bg:#181818;--field:#1e1e1e;--card:#232323;--line:#4a4a4a;--text:#f2f2f2;--mute:#8a8a8a;--accent:#86b055;--mine:#3d5a2a;--err:#e0685f;--fs:16px;--br:17px;--wall:#181818;--nav:#222;--navon:#2c3626;--sheet:#202020;--bd:#333}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px)}
-button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px)}
+button{font:inherit;color:inherit}
+svg{display:block}
+button:focus-visible,input:focus-visible{outline:3px solid #cfe8ad;outline-offset:2px}
 .hide{display:none!important}
 .screen{display:none;max-width:420px;margin:0 auto;padding:16px 24px 32px;min-height:90vh;flex-direction:column}
 .screen.on{display:flex}
+.back{background:none;border:0;font-size:28px;padding:8px 0;width:40px;text-align:left;cursor:pointer}
 h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 .sub{color:var(--mute);text-align:center;font-size:17px;line-height:1.5;margin:0 0 36px}
-.go{align-self:flex-end;margin-top:10px;width:62px;height:62px;border-radius:50%;background:var(--accent);color:#fff;font-size:28px;display:grid;place-items:center}
+.country{display:flex;justify-content:space-between;width:100%;background:none;border:1px solid var(--line);border-radius:14px;padding:18px 16px;font-size:17px;cursor:pointer}
+.country span:last-child{color:var(--mute)}
+.phone{position:relative;margin-top:22px;border:2px solid var(--accent);border-radius:14px;display:flex;align-items:center;padding:20px 16px 14px}
+.phone label{position:absolute;top:-11px;left:12px;background:var(--bg);padding:0 6px;color:var(--accent);font-size:14px}
+.cc{font-size:19px;width:64px;border-right:1px solid var(--line);margin-right:14px}
+.phone input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:19px}
+.msg{min-height:24px;text-align:center;margin:14px 0 0;color:var(--err);font-size:15px}
+.go{align-self:flex-end;margin-top:10px;width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:28px;cursor:pointer}
+.go:disabled{opacity:.35}
+.code{width:100%;background:var(--field);border:2px solid var(--accent);border-radius:14px;padding:16px;text-align:center;font-size:32px;letter-spacing:14px;color:var(--text);outline:0}
+.link{background:none;border:0;color:var(--accent);font-size:16px;margin-top:20px;cursor:pointer;align-self:center}
+.link:disabled{color:var(--mute)}
+/* приложение */
 #app{display:none;height:100%;max-width:560px;margin:0 auto;position:relative;overflow:hidden}
 #app.on{display:block}
 .tab{display:none;height:100%;flex-direction:column}
 .tab.on{display:flex}
-.top{display:flex;align-items:center;gap:10px;padding:10px 16px;min-height:56px;background:var(--nav);border-bottom:1px solid var(--line)}
-.top h2{flex:1;margin:0;font-size:20px;font-weight:600}
-.ico{background:none;border:0;border-radius:50%;width:40px;height:40px;display:grid;place-items:center;flex:none;color:var(--mute)}
-.scroll{flex:1;overflow:auto;padding:0 0 85px}
-.row{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;padding:10px 16px;text-align:left;border-bottom:1px solid var(--line)}
-.row:active{background:var(--field)}
+.top{display:flex;align-items:center;gap:10px;padding:12px 16px;min-height:64px}
+.top h2{flex:1;margin:0;font-size:24px;font-weight:600}
+.ico{background:var(--card);border:0;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
+.sbox{flex:1;background:var(--card);border:0;border-radius:22px;padding:12px 16px;color:var(--text);font-size:17px;outline:0;min-width:0}
+.scroll{flex:1;overflow:auto;padding:0 8px 130px}
+.row{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;padding:10px 8px;text-align:left;cursor:pointer;border-radius:14px}
+.row:active{background:var(--card)}
 .ava{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-size:22px;font-weight:600;flex:none;color:#fff;position:relative}
 .rb{flex:1;min-width:0}
-.rt{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rs{color:var(--mute);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.rt{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{color:var(--mute);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .rr{color:var(--mute);font-size:13px;flex:none}
-.fab{position:fixed;right:20px;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.3);z-index:3}
-.nav{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;background:var(--nav);border-radius:30px;padding:6px 10px;z-index:3;max-width:440px;margin:0 auto;box-shadow:0 4px 15px rgba(0,0,0,0.5);align-items:center;}
-.nav button{flex:1;background:none;border:0;border-radius:20px;padding:8px 2px;color:var(--mute);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:3px;transition:0.2s;}
-.nav button.on{color:var(--accent);background:var(--navon);}
-.page{flex:1;overflow:auto;padding:0 0 85px}
-.hero{text-align:center;padding:20px 0 18px;border-bottom:1px solid var(--line);margin-bottom:10px}
-.hero .ava{width:100px;height:100px;font-size:40px;margin:0 auto 14px}
-.hero h3{margin:0 0 6px;font-size:22px;font-weight:600}
-.hero p{margin:0;color:var(--mute);font-size:15px}
-.card{background:var(--bg);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:0 16px;margin-bottom:15px}
+.btn{background:var(--accent);color:#14210a;border:0;border-radius:18px;padding:8px 14px;font-weight:600;cursor:pointer;flex:none}
+.sec{color:var(--accent);font-size:14px;padding:14px 10px 4px}
+.empty{color:var(--mute);text-align:center;padding:60px 30px;line-height:1.5;white-space:pre-line}
+.fab{position:absolute;right:18px;bottom:calc(env(safe-area-inset-bottom,0px) + 100px);width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:grid;place-items:center;cursor:pointer;z-index:3}
+.nav{position:absolute;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:2px;background:var(--nav);border-radius:34px;padding:6px;z-index:3}
+.nav button{flex:1;background:none;border:0;border-radius:28px;padding:9px 2px 8px;color:var(--text);font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav button.on{background:var(--navon);color:var(--accent)}
+.nav .ni{height:26px;display:grid;place-items:center}
+/* профиль и настройки */
+.page{flex:1;overflow:auto;padding:0 14px 130px}
+.hero{text-align:center;padding:8px 0 18px}
+.hero .ava{width:116px;height:116px;font-size:48px;margin:0 auto 14px}
+.hero h3{margin:0 0 6px;font-size:23px;font-weight:600}
+.hero p{margin:0;color:var(--mute);font-size:16px}
+.cam{position:absolute;right:-2px;bottom:-2px;width:38px;height:38px;border-radius:50%;background:var(--accent);display:grid;place-items:center;color:#14210a;border:3px solid var(--bg);cursor:pointer}
+.acts{display:flex;gap:10px;margin-bottom:14px}
+.acts button{flex:1;background:var(--card);border:0;border-radius:18px;padding:16px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer}
+.card{background:var(--card);border-radius:22px;padding:6px 16px;margin-bottom:14px}
 .kv{padding:12px 0}
-.kv .v{font-size:17px;font-weight:600}
-.kv .k{color:var(--mute);font-size:14px;margin-top:3px}
-.srow{display:flex;align-items:center;gap:16px;width:100%;background:none;border:0;padding:14px 0;text-align:left;border-bottom:1px solid var(--line)}
-.srow:last-child{border-bottom:0}
-.si{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;flex:none}
-.srow .rt{font-size:17px;font-weight:400}
-.srow .rs{white-space:normal;font-size:14px}
-#acc,#chat,#cset,#web{position:absolute;inset:0;background:var(--bg);z-index:8;display:none;flex-direction:column}
-#acc.on,#chat.on,#cset.on,#web.on{display:flex}
-.msgs{flex:1;overflow:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--wall)}
-.b{max-width:80%;padding:8px 12px;border-radius:12px;font-size:16px;background:var(--card);align-self:flex-start;line-height:1.35;word-break:break-word;white-space:pre-wrap;position:relative}
+.kv .v{font-size:19px;font-weight:600}
+.kv .k{color:var(--mute);font-size:15px;margin-top:3px}
+.srow{display:flex;align-items:center;gap:16px;width:100%;background:none;border:0;padding:12px 0;text-align:left;cursor:pointer}
+.si{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff;flex:none}
+.srow .rt{font-size:18px}
+.srow .rs{white-space:normal}
+/* аккаунт */
+#acc,#chat{position:absolute;inset:0;background:var(--bg);z-index:8;display:none;flex-direction:column}
+#acc.on,#chat.on{display:flex}
+.lab{color:var(--accent);font-size:14px;margin:12px 0 4px}
+.inp{display:block;width:100%;background:none;border:0;border-bottom:1px solid var(--bd);padding:12px 0;color:var(--text);font-size:19px;outline:0}
+.inp::placeholder{color:var(--mute)}
+.inp:last-child{border-bottom:0}
+.cnt{display:flex;align-items:center}
+.cnt .inp{flex:1;border:0}.cnt span{color:var(--mute);font-size:19px}
+.hint{color:var(--mute);font-size:15px;padding:0 6px 14px;line-height:1.4}
+.pbtn{width:100%;margin-top:6px;background:var(--accent);color:#14210a;border:0;border-radius:16px;padding:15px;font-size:17px;font-weight:600;cursor:pointer}
+.pbtn.alt{background:var(--card);color:var(--err);margin-top:12px}
+.pmsg{min-height:22px;text-align:center;margin-top:10px;font-size:15px}
+/* чат */
+.msgs{flex:1;overflow:auto;padding:8px 12px;display:flex;flex-direction:column;gap:6px;background:var(--wall)}
+.b{max-width:80%;padding:8px 12px;border-radius:var(--br);font-size:var(--fs);background:var(--card);align-self:flex-start;line-height:1.35;word-break:break-word;white-space:pre-wrap}
 .b.mine{background:var(--mine);color:#fff;align-self:flex-end}
-.b .tm{color:var(--mute);font-size:11px;text-align:right;margin-top:4px}
-.b.mine .tm{color:#a0b8d0}
-.compose{display:flex;align-items:flex-end;gap:8px;padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 8px);background:var(--nav);border-top:1px solid var(--line)}
-.cbox{flex:1;display:flex;align-items:center;background:var(--field);border-radius:18px;padding:0 6px;min-width:0}
-.cbox textarea{flex:1;background:none;border:0;padding:12px 4px;color:var(--text);font:inherit;font-size:16px;outline:0;min-width:0;resize:none;max-height:120px;height:44px}
-.sendb{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;flex:none}
-
-.country{display:flex;justify-content:space-between;width:100%;background:none;border:1px solid var(--line);border-radius:14px;padding:18px 16px;font-size:17px;cursor:pointer;color:var(--text);margin-bottom:20px}
-.country span:last-child{color:var(--mute)}
-.phone{position:relative;margin-top:22px;border:2px solid var(--accent);border-radius:14px;display:flex;align-items:center;padding:20px 16px 14px;width:100%}
-.phone label{position:absolute;top:-11px;left:12px;background:var(--bg);padding:0 6px;color:var(--accent);font-size:14px}
-.cc{font-size:19px;width:64px;border-right:1px solid var(--line);margin-right:14px}
-.phone input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:19px}
-.go{align-self:flex-end;margin-top:20px;width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:28px;cursor:pointer;display:grid;place-items:center}
-<link rel="stylesheet" href="/style.css"></style></head><body>
+.b .who{color:var(--accent);font-size:13px;font-weight:600;margin-bottom:2px}
+.b .tm{color:var(--mute);font-size:11px;text-align:right;margin-top:2px}
+.compose{display:flex;align-items:center;gap:8px;padding:8px 10px calc(env(safe-area-inset-bottom,0px) + 8px)}
+.cbox{flex:1;display:flex;align-items:center;background:var(--card);border-radius:26px;padding:0 6px;min-width:0}
+.cbox textarea{flex:1;background:none;border:0;padding:15px 4px;color:var(--text);font:inherit;font-size:18px;line-height:1.25;outline:0;min-width:0;resize:none;max-height:120px;height:52px}
+.cib{background:none;border:0;width:42px;height:42px;display:grid;place-items:center;color:var(--mute);cursor:pointer;flex:none;padding:0}
+.sendb{width:52px;height:52px;border-radius:50%;border:0;background:var(--accent);color:#14210a;display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
+.note{color:var(--mute);text-align:center;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px);font-size:15px}
+/* шторка и сообщение */
+#sheet{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:9;display:none;align-items:flex-end}
+#sheet.on{display:flex}
+.sh{width:100%;background:var(--sheet);border-radius:24px 24px 0 0;padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 20px)}
+.sh h3{margin:0 0 12px;font-size:19px}
+.sh input{width:100%;background:var(--card);border:0;border-radius:14px;padding:14px;color:var(--text);font-size:17px;outline:0}
+.sh .two{display:flex;gap:10px;margin-top:14px}
+.sh .two button{flex:1;background:var(--accent);color:#14210a;border:0;border-radius:14px;padding:13px;font-weight:600;cursor:pointer}
+.sh .x{background:none;border:0;color:var(--mute);width:100%;margin-top:10px;padding:8px;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 110px);transform:translateX(-50%);background:#333;color:#fff;padding:10px 18px;border-radius:20px;font-size:15px;z-index:20;display:none;max-width:90%;text-align:center}
+:root[data-theme=light]{--bg:#f2f3ef;--field:#fff;--card:#fff;--line:#c9c9c9;--text:#141414;--mute:#6a6a6a;--nav:#e4e6df;--navon:#d5e4c6;--sheet:#fff;--bd:#e0e0e0}
+body.noanim *{transition:none!important;animation:none!important}
+#cset,#web{position:absolute;inset:0;background:var(--bg);z-index:8;display:none;flex-direction:column}
+#cset.on,#web.on{display:flex}
+#pk{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:12;display:none;align-items:flex-end}
+#pk.on{display:flex}
+#pk .sh .pbtn{margin-top:10px}
+.b a{word-break:break-all}
+.lab2{color:var(--accent);font-size:15px}
+.slh{display:flex;justify-content:space-between;align-items:center;padding-top:12px}
+.slv{color:var(--accent);font-size:26px;font-weight:600}
+input[type=range]{width:100%;accent-color:var(--accent);height:30px;margin:6px 0 10px}
+.pv{background:var(--wall);padding:14px 12px;display:flex;flex-direction:column;gap:8px;margin:4px -16px 6px}
+.quote{background:rgba(79,209,197,.15);border-left:3px solid #4fd1c5;border-radius:6px;padding:4px 8px;margin-bottom:4px}
+.qn{color:#4fd1c5;font-size:13px;font-weight:600}
+.act .ai{color:var(--mute);width:44px;display:grid;place-items:center;flex:none}
+.act .at{color:var(--accent);font-size:18px;font-weight:600}
+.chip{background:var(--mine);color:#fff;border-radius:16px;padding:6px 12px;font-size:14px;font-weight:600;flex:none;max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.car{display:flex;gap:10px;overflow-x:auto;padding:6px 0 14px}
+.tc{position:relative;flex:none;width:96px;height:140px;border-radius:14px;border:3px solid transparent;cursor:pointer;display:block;padding:0;overflow:hidden}
+.tc.sel{border-color:var(--accent)}
+.tm1{position:absolute;top:14px;left:20px;right:10px;height:26px;border-radius:13px}
+.tm2{position:absolute;top:56px;left:10px;right:24px;height:26px;border-radius:13px;background:rgba(90,90,90,.65)}
+.te{position:absolute;bottom:12px;left:0;right:0;font-size:34px;text-align:center}
+.lines{display:flex;gap:12px;padding:8px 0 14px}
+.ln{flex:1;background:none;border:2px solid transparent;border-radius:14px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:15px;cursor:pointer;color:var(--text)}
+.ln.sel{border-color:var(--accent);color:var(--accent)}
+.lpv{width:100%;display:flex;flex-direction:column;gap:6px;padding:0 8px}
+.lpv i{display:block;height:6px;border-radius:3px;background:var(--mute);opacity:.6}
+.lpv i:first-child{width:60%;background:var(--text);opacity:.8}
+.icons{gap:14px}
+.ic{flex:none;background:none;border:3px solid transparent;border-radius:18px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;color:var(--text)}
+.ic.sel{border-color:var(--accent);color:var(--accent)}
+.icl{font-size:14px;font-weight:600}
+.swp{display:flex;gap:14px;align-items:center;padding:8px 0 10px}
+.swpv{width:120px;height:56px;border-radius:12px;background:var(--bg);display:flex;align-items:center;padding:0 10px;gap:8px;flex:none}
+.swpv i{width:22px;height:22px;border-radius:50%;background:var(--mute);opacity:.6;flex:none}
+.swpv b{flex:1;height:8px;border-radius:4px;background:var(--mute);opacity:.5}
+.swo{flex:1;display:flex;flex-direction:column}
+.so{background:none;border:0;border-top:2px solid transparent;border-bottom:2px solid transparent;padding:12px 4px;font-size:18px;color:var(--mute);cursor:pointer;font-weight:600}
+.so.sel{color:var(--text);border-color:var(--accent)}
+.walls,.sw{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.wl,.dot{aspect-ratio:1;border-radius:14px;border:3px solid transparent;cursor:pointer;padding:0}
+.dot{border-radius:50%}
+.wl.sel,.dot.sel{border-color:var(--text)}
+.tg{width:54px;height:32px;border-radius:16px;border:2px solid #666;background:transparent;position:relative;flex:none;cursor:pointer;padding:0}
+.tg::after{content:"";position:absolute;top:3px;left:4px;width:22px;height:22px;border-radius:50%;background:#888;transition:left .2s}
+.tg[aria-checked=true]{background:var(--accent);border-color:var(--accent)}
+.tg[aria-checked=true]::after{left:26px;background:#fff}
+.trow{cursor:default}
+.val{color:var(--accent);font-weight:600;font-size:18px;flex:none}
+.swr{position:relative;overflow:hidden;border-radius:14px}
+.swr .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:24px;font-weight:600;color:#fff}
+.swr .row{background:var(--bg);position:relative;transition:transform .2s}
+.webbar{display:flex;align-items:center;gap:10px;padding:10px 12px}
+</style></head><body>
 
 <section class="screen on" id="s1">
  <button class="back" aria-label="Назад">←</button>
@@ -370,7 +450,7 @@ h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 
 <div id="app">
  <section class="tab on" id="tChats">
-  <div class="top" id="topNormal"><h2>NuzaGram</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
+  <div class="top" id="topNormal"><h2>Приватка</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
   <div class="top hide" id="topSearch"><button class="ico" id="sBack" aria-label="Закрыть поиск"></button><input class="sbox" id="sInp" placeholder="Поиск людей, групп и каналов" autocomplete="off"></div>
   <div class="scroll" id="chatList"></div>
   <div class="scroll hide" id="searchRes"></div>
@@ -515,7 +595,7 @@ function row(name,av,title,sub,right,fn,div){var r=h(div?"div":"button","row");
 var KIND={group:"Группа",channel:"Канал",dm:""};
 
 function loadChats(){api("GET","/api/chats").then(function(l){
- if(!Array.isArray(l)||searching)return;var box=$("chatList");box.innerHTML="";box.appendChild(fbar());l=sortPins(l).filter(inFolder);
+ if(!Array.isArray(l)||searching)return;var box=$("chatList");box.innerHTML="";l=sortPins(l);
  if(!l.length){box.appendChild(h("div","empty","Чатов пока нет.\nНажми +, чтобы создать группу или канал, или найди человека через поиск."));return}
  l.forEach(function(c){var sub=c.last||(KIND[c.type]?KIND[c.type]+" · "+c.members+" уч.":"Нет сообщений");
   addChatRow(box,c,sub)})})}
@@ -593,7 +673,7 @@ function loadSettings(){loadMe(function(m){if(!m||m.error)return;var b=$("setBox
  var card=h("div","card");
  SET.forEach(function(s){var r=h("button","srow");var i=h("span","si");i.style.background=s[3];i.innerHTML=ic(s[4],24);r.appendChild(i);
   var t=h("div","rb");t.appendChild(h("div","rt",s[1]));t.appendChild(h("div","rs",s[2]));r.appendChild(t);
-  r.onclick=function(){if(s[0]==="acc")openAcc();else if(s[0]==="chat")openCset();else openSection(s[0])};card.appendChild(r)});
+  r.onclick=function(){if(s[0]==="acc")openAcc();else if(s[0]==="chat")openCset();else toast("Этот раздел скоро будет")};card.appendChild(r)});
  b.appendChild(card)})}
 
 /* аккаунт */
@@ -805,123 +885,6 @@ function linkify(t){var f=document.createDocumentFragment();t.split(URLRE).forEa
  else if(p)f.appendChild(document.createTextNode(p))});return f}
 function openWeb(u){$("webT").textContent=u;$("webF").src=u;$("webExt").onclick=function(){window.open(u,"_blank","noopener")};$("web").classList.add("on")}
 $("webBack").innerHTML=ic("back");$("webBack").onclick=function(){$("web").classList.remove("on");$("webF").src="about:blank"};
-
-/* ===== НАСТРОЙКИ КАК В TELEGRAM =====
-   Вставь этот блок в конец сайта (внутри <script>), ПЕРЕД строкой  applyCfg();
-   Без обратных кавычек и  — чтобы не сломать String.raw. */
-
-var D2={p_phone:"Все",p_seen:"Все",p_photo:"Все",p_fwd:"Все",p_call:"Все",p_inv:"Все",autoDel:"Никогда",delAcc:"6 мес.",
- n_dm:true,n_dm_t:true,n_dm_s:true,n_gr:true,n_gr_t:true,n_gr_s:true,n_ch:true,n_ch_t:true,n_ch_s:true,
- a_snd:true,a_vib:true,a_pre:true,badge:true,badgeM:true,n_join:true,
- d_mob:true,d_wifi:true,d_roam:false,d_gif:true,d_vid:true,d_save:false,d_low:false,
- f_dm:false,f_group:false,f_channel:false,fcur:"all",pow:false,powAt:15,lang:"ru"};
-Object.keys(D2).forEach(function(k){if(CFG[k]===undefined)CFG[k]=D2[k]});
-
-var st2=document.createElement("style");
-st2.textContent="#sub{position:absolute;inset:0;background:var(--bg);z-index:8;display:none;flex-direction:column}#sub.on{display:flex}"+
- ".fbar{display:flex;gap:8px;overflow-x:auto;padding:4px 8px 10px}.fbar:empty{display:none}"+
- ".fb{background:var(--card);border:0;border-radius:18px;padding:8px 14px;font-weight:600;color:var(--mute);flex:none;cursor:pointer}"+
- ".fb.sel{background:var(--navon);color:var(--accent)}";
-document.head.appendChild(st2);
-
-/* разделы в списке настроек */
-["priv","notif","data","fold","dev","pow","lang"].forEach(function(id,i){SET[2+i][0]=id});
-
-/* каркас подэкрана */
-function openSub(title,build){var s=$("sub");
- if(!s){s=h("div");s.id="sub";
-  s.innerHTML='<div class="top"><button class="ico" id="subBack" aria-label="Назад"></button><h2 id="subT" style="text-align:center;margin-right:44px"></h2></div><div class="page" id="subBox"></div>';
-  $("app").appendChild(s);$("subBack").innerHTML=ic("back");$("subBack").onclick=function(){s.classList.remove("on")}}
- $("subT").textContent=title;var b=$("subBox");b.innerHTML="";build(b);s.classList.add("on")}
-function cd(t){var c=card(t);for(var i=1;i<arguments.length;i++)c.appendChild(arguments[i]);return c}
-function hint(t){return h("div","hint",t)}
-function line(title,sub,val,fn){var r=h(fn?"button":"div","srow");var t=h("div","rb");t.appendChild(h("div","rt",title));
- if(sub)t.appendChild(h("div","rs",sub));r.appendChild(t);if(val)r.appendChild(h("div","val",val));if(fn)r.onclick=fn;return r}
-
-var V3=["Все","Мои контакты","Никто"];
-
-/* Конфиденциальность */
-function sPriv(b){
- b.appendChild(cd("Кто может видеть",valrow("Номер телефона","p_phone",V3),valrow("Время захода и онлайн","p_seen",V3),
-  valrow("Фото профиля","p_photo",V3),valrow("Пересылка сообщений","p_fwd",V3),valrow("Звонки","p_call",V3),valrow("Приглашения в группы","p_inv",V3)));
- b.appendChild(hint("Нажимай на пункт, чтобы переключать: Все → Мои контакты → Никто."));
- b.appendChild(cd("Безопасность",line("Код-пароль","Блокировка при входе в приложение","Выкл",function(){toast("Код-пароль скоро будет")}),
-  line("Заблокированные пользователи",null,"0",function(){toast("Список пуст")})));
- b.appendChild(cd("Автоудаление сообщений",valrow("Таймер по умолчанию","autoDel",["Никогда","1 день","1 неделя","1 месяц"])));
- b.appendChild(cd("Удаление аккаунта",valrow("Если вы не заходите","delAcc",["1 мес.","3 мес.","6 мес.","12 мес."])));
- b.appendChild(hint("Если вы не заходите в приложение в течение этого срока, аккаунт будет удалён вместе с сообщениями и контактами."))}
-
-/* Уведомления */
-function sNotif(b){
- [["Личные чаты","n_dm"],["Группы","n_gr"],["Каналы","n_ch"]].forEach(function(x){var k=x[1];
-  b.appendChild(cd(x[0],toggle("Показывать уведомления",null,k),toggle("Показывать текст",null,k+"_t"),toggle("Звук",null,k+"_s")))});
- b.appendChild(cd("Уведомления в приложении",toggle("Звуки",null,"a_snd"),toggle("Вибрация",null,"a_vib"),toggle("Предпросмотр сообщений",null,"a_pre")));
- b.appendChild(cd("Счётчик значков",toggle("Включая заглушённые чаты","Показывать и заглушённые чаты","badgeM"),toggle("Считать чаты, а не сообщения",null,"badge")));
- b.appendChild(cd("Прочее",toggle("Контакт присоединился","Уведомлять, когда контакт появился в Приватке","n_join")));
- var r=h("button","pbtn alt","Сбросить все уведомления");
- r.onclick=function(){Object.keys(D2).forEach(function(k){if(/^(n_|a_|badge)/.test(k))CFG[k]=D2[k]});saveCfg();toast("Уведомления сброшены");openSection("notif")};
- b.appendChild(r)}
-
-/* Данные и память */
-function sData(b){var kb=0;try{kb=Math.round(JSON.stringify(localStorage).length/1024)}catch(e){}
- b.appendChild(cd("Использование памяти",line("Настройки и обои",null,kb+" КБ")));
- var cl=h("button","pbtn alt","Очистить обои из кэша");cl.style.color="var(--text)";
- cl.onclick=function(){CFG.wallImg="";applyCfg();saveCfg();toast("Кэш очищен");openSection("data")};b.appendChild(cl);
- b.appendChild(cd("Автозагрузка медиа",toggle("Через мобильную сеть",null,"d_mob"),toggle("Через Wi-Fi",null,"d_wifi"),toggle("В роуминге",null,"d_roam")));
- b.appendChild(cd("Автовоспроизведение",toggle("GIF",null,"d_gif"),toggle("Видео",null,"d_vid")));
- b.appendChild(cd("Прочее",toggle("Сохранять в галерею","Сохранять полученные фото и видео","d_save"),toggle("Экономия трафика","Меньше данных при загрузке","d_low")))}
-
-/* Папки с чатами */
-var FOLD=[["dm","Личные"],["group","Группы"],["channel","Каналы"]];
-function sFold(b){b.appendChild(hint("Папки показываются вкладками над списком чатов."));
- b.appendChild(cd("Рекомендуемые папки",toggle("Личные","Только переписки один на один","f_dm"),toggle("Группы",null,"f_group"),toggle("Каналы",null,"f_channel")))}
-function fbar(){var bar=h("div","fbar"),on=FOLD.filter(function(f){return CFG["f_"+f[0]]});
- if(CFG.fcur!=="all"&&!CFG["f_"+CFG.fcur])CFG.fcur="all";
- if(!on.length)return bar;
- [["all","Все чаты"]].concat(on).forEach(function(f){var x=h("button","fb"+(CFG.fcur===f[0]?" sel":""),f[1]);
-  x.onclick=function(){CFG.fcur=f[0];saveCfg();loadChats()};bar.appendChild(x)});return bar}
-function inFolder(c){return CFG.fcur==="all"||c.type===CFG.fcur}
-
-/* Устройства (реальные сеансы с сервера) */
-function uaName(u){u=u||"";
- var o=/Android/.test(u)?"Android":/iPhone|iPad/.test(u)?"iOS":/Windows/.test(u)?"Windows":/Mac OS/.test(u)?"macOS":/Linux/.test(u)?"Linux":"Устройство";
- var br=/Edg\//.test(u)?"Edge":/OPR\//.test(u)?"Opera":/Firefox\//.test(u)?"Firefox":/Chrome\//.test(u)?"Chrome":/Safari\//.test(u)?"Safari":"Браузер";
- return br+" · "+o}
-function sDev(b){b.appendChild(h("div","empty","Загрузка…"));
- api("GET","/api/devices").then(function(l){b.innerHTML="";
-  if(!Array.isArray(l)){b.appendChild(h("div","empty","Не удалось загрузить"));return}
-  var cur=l.filter(function(x){return x.cur})[0],ot=l.filter(function(x){return !x.cur});
-  if(cur)b.appendChild(cd("Это устройство",line(uaName(cur.ua),"Сейчас в сети")));
-  if(ot.length){var rest=card("Активные сеансы");
-   ot.forEach(function(x){rest.appendChild(line(uaName(x.ua),x.t?"Вход: "+new Date(x.t).toLocaleString("ru"):"",null,function(){
-    if(confirm("Завершить этот сеанс?"))api("POST","/api/devices/end",{id:x.id}).then(function(){openSection("dev")})}))});
-   b.appendChild(rest);
-   var all=h("button","pbtn alt","Завершить все другие сеансы");
-   all.onclick=function(){if(confirm("Завершить все другие сеансы?"))api("POST","/api/devices/end",{all:true}).then(function(){toast("Сеансы завершены");openSection("dev")})};
-   b.appendChild(all);b.appendChild(hint("Нажми на сеанс, чтобы завершить его."))}
-  else b.appendChild(hint("Других активных сеансов нет."))})}
-
-/* Энергосбережение */
-var LOWBAT=false;
-function sPow(b){b.appendChild(cd("Энергосбережение",toggle("Режим энергосбережения","Отключает анимации интерфейса","pow")));
- b.appendChild(slider("Включать при заряде ниже, %",0,100,"powAt"));
- b.appendChild(hint("0 — не включать автоматически. Работает там, где браузер даёт доступ к заряду батареи."))}
-var _ap=applyCfg;
-applyCfg=function(){_ap();document.body.classList.toggle("noanim",!CFG.anim||CFG.pow||LOWBAT)};
-if(navigator.getBattery)navigator.getBattery().then(function(bt){
- function u(){LOWBAT=CFG.powAt>0&&!bt.charging&&bt.level*100<=CFG.powAt;applyCfg()}
- bt.onlevelchange=u;bt.onchargingchange=u;u()});
-
-/* Язык */
-var LANGS=[["ru","Русский","Русский"],["en","English","Английский"],["uk","Українська","Украинский"],["es","Español","Испанский"],["de","Deutsch","Немецкий"],["tr","Türkçe","Турецкий"]];
-function sLang(b){var c=card("Язык интерфейса");
- LANGS.forEach(function(l){c.appendChild(line(l[1],l[2],CFG.lang===l[0]?"✓":"",function(){
-  if(l[0]!=="ru"){toast("Интерфейс пока только на русском");return}CFG.lang="ru";saveCfg()}))});
- b.appendChild(c)}
-
-var SEC={priv:["Конфиденциальность",sPriv],notif:["Уведомления",sNotif],data:["Данные и память",sData],
- fold:["Папки с чатами",sFold],dev:["Устройства",sDev],pow:["Энергосбережение",sPow],lang:["Язык",sLang]};
-function openSection(id){var s=SEC[id];if(!s){toast("Этот раздел скоро будет");return}openSub(s[0],s[1])}
 
 applyCfg();
 setInterval(function(){if(CFG.auto)applyCfg()},60000);
