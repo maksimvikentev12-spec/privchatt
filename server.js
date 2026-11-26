@@ -347,7 +347,7 @@ h1{font-size:22px;font-weight:600;text-align:center;margin:56px 0 12px}
 .cc{font-size:19px;width:64px;border-right:1px solid var(--line);margin-right:14px}
 .phone input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:19px}
 .go{align-self:flex-end;margin-top:20px;width:62px;height:62px;border-radius:50%;border:0;background:var(--accent);color:#fff;font-size:28px;cursor:pointer;display:grid;place-items:center}
-</style></head><body>
+<link rel="stylesheet" href="/style.css"></style></head><body>
 
 <section class="screen on" id="s1">
  <button class="back" aria-label="Назад">←</button>
