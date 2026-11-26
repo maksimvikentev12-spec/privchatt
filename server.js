@@ -653,7 +653,7 @@ function loadProfile(){loadMe(function(m){if(!m||m.error)return;var b=$("profBox
  var hero=h("div","hero");hero.appendChild(ava(full(m),m.avId));hero.appendChild(h("h3",null,full(m)));hero.appendChild(h("p",null,"в сети"));b.appendChild(hero);
  var acts=h("div","acts");
  [["cam","Выбрать фото",pickPhoto],["pen","Изменить",openAcc],["gear","Настройки",function(){setTab("tSettings")}]].forEach(function(a){
-  var bt=h("button");var s=h("span");s.innerHTML=ic(a[0],26);bt.appendChild(s);bt.appendChild(document.createTextNode(a[1]));bt.onclick=a[2];acts.appendChild(bt)});
+  var bt=h("button");var s=h("span");s.innerHTML=ic(a[0],26);bt.appendChild(s);bt.appendChild(document.createTextNode(a[1]));bt.onclick=a[2];bt.onclick = a[2]; acts.appendChild(bt)});
  b.appendChild(acts);
  var card=h("div","card");card.appendChild(kv(m.phone,"Телефон"));
  card.appendChild(kv(m.username?"@"+m.username:"Не указано","Имя пользователя"));
@@ -1157,8 +1157,8 @@ function build(){var w=el("div");w.setAttribute("data-nz","1");w.style.paddingBo
  w.appendChild(c1);w.appendChild(c2);w.appendChild(el("div","nz-ver",NZ+" · версия 1.0"));return w}
 
 var busy=false;
-function inject(){busy=false;var box=document.getElementById("setBox");
- if(!box||!box.firstChild||box.querySelector("[data-nz]"))return;box.appendChild(build())}
+function inject(){busy=false;var box=document.getElementById("setBox"); if(box && box.id === "profBox") return;
+ if(!box||!box.firstChild||box.querySelector("[data-nz]"))return; if(box.id !== "setBox") return;box.appendChild(build())}
 new MutationObserver(function(){if(!busy){busy=true;requestAnimationFrame(inject)}}).observe(document.body,{childList:true,subtree:true});
 inject();
 })();
