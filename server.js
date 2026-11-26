@@ -1053,4 +1053,114 @@ setInterval(function(){if(CFG.auto)applyCfg()},60000);
 /* старт */
 buildNav();
 if(T){api("GET","/api/me").then(function(m){if(m&&!m.error)enterApp()})}
+/*NZ-EXTRA*/
+(function(){
+var NZ="NazeGram";
+var SUPPORT=""; 
+
+var css=document.createElement("style");
+css.textContent=
+".nz-card{background:var(--card,#223040);border-radius:22px;padding:6px 16px;margin:0 0 14px}"+
+".nz-lab{color:var(--accent,#86b055);font-size:14px;padding:12px 0 4px}"+
+".nz-row{display:flex;align-items:center;gap:16px;width:100%;background:none;border:0;color:var(--text,#fff);padding:12px 0;text-align:left;font:inherit;font-size:18px;font-weight:600;cursor:pointer}"+
+".nz-ico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:#fff;flex:none}"+
+".nz-ver{color:var(--mute,#7d8da1);text-align:center;font-size:14px;padding:4px 0 16px}"+
+".nz-scr{position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;background:var(--bg,#18222d);color:var(--text,#fff);display:flex;flex-direction:column}"+
+".nz-top{display:flex;align-items:center;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px}"+
+".nz-back{background:var(--card,#223040);border:0;border-radius:50%;width:44px;height:44px;color:inherit;font-size:22px;cursor:pointer;flex:none}"+
+".nz-title{font-size:22px;font-weight:600}"+
+".nz-body{flex:1;overflow:auto;padding:0 16px 40px}"+
+".nz-hero{text-align:center;padding:16px 0 8px}"+
+".nz-big{width:96px;height:96px;border-radius:28px;margin:0 auto 16px;display:grid;place-items:center;color:#fff}"+
+".nz-h{font-size:24px;font-weight:700;margin:0 0 8px}"+
+".nz-p{color:var(--mute,#7d8da1);font-size:16px;line-height:1.5;margin:0 0 12px}"+
+".nz-btn{width:100%;background:var(--accent,#86b055);color:#14210a;border:0;border-radius:16px;padding:15px;font-size:17px;font-weight:600;cursor:pointer;margin-top:8px}"+
+".nz-li{display:flex;gap:14px;align-items:flex-start;padding:12px 0}"+
+".nz-li b{display:block;font-size:17px;margin-bottom:2px}"+
+".nz-li span{color:var(--mute,#7d8da1);font-size:15px;line-height:1.4}"+
+".nz-em{font-size:26px;width:44px;text-align:center;flex:none}"+
+".nz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}"+
+".nz-gi{background:var(--card,#223040);border:0;border-radius:18px;padding:20px 4px;font-size:38px;cursor:pointer}"+
+".nz-q{border-bottom:1px solid rgba(128,128,128,.25);padding:14px 0}"+
+".nz-q summary{font-weight:600;font-size:17px;cursor:pointer}"+
+".nz-q p{color:var(--mute,#7d8da1);font-size:16px;line-height:1.5;margin:10px 0 0}"+
+".nz-toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#333;color:#fff;padding:10px 18px;border-radius:20px;font-size:15px;z-index:100000;max-width:90%;text-align:center}";
+document.head.appendChild(css);
+
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function svg(p,s){s=s||24;return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>'}
+var IC={
+ star:'<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5l-5.4 3 1.2-6L3.3 9.3l6.1-.7z"/>',
+ shop:'<path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 2 3 2 4 0 1 2 3 2 4 0 1 2 3 2 4 0 1 2 4 2 4 0M10 20v-5h4v5"/>',
+ gift:'<rect x="3" y="9" width="18" height="4"/><path d="M5 13v8h14v-8M12 9v12M12 9c-3 0-4.5-4-1.5-4 1.5 0 1.5 2 1.5 4zM12 9c3 0 4.5-4 1.5-4-1.5 0-1.5 2-1.5 4z"/>',
+ chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>',
+ help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/>',
+ bulb:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5L16 9.5"/>'
+};
+
+function toast(t){var e=el("div","nz-toast",t);document.body.appendChild(e);setTimeout(function(){e.remove()},2200)}
+function row(icon,color,title,fn){var b=el("button","nz-row");var i=el("span","nz-ico");i.style.background=color;i.innerHTML=svg(IC[icon]);
+ b.appendChild(i);b.appendChild(el("span",null,title));b.onclick=fn;return b}
+function screen(title,build){var s=el("div","nz-scr"),t=el("div","nz-top"),b=el("button","nz-back","←");b.setAttribute("aria-label","Назад");
+ b.onclick=function(){s.remove()};t.appendChild(b);t.appendChild(el("div","nz-title",title));
+ var body=el("div","nz-body");build(body);s.appendChild(t);s.appendChild(body);document.body.appendChild(s)}
+function hero(icon,color,title,text){var h=el("div","nz-hero"),b=el("div","nz-big");b.style.background=color;b.innerHTML=svg(IC[icon],48);
+ h.appendChild(b);h.appendChild(el("div","nz-h",title));h.appendChild(el("p","nz-p",text));return h}
+function items(list){var w=el("div","nz-card");list.forEach(function(x){var r=el("div","nz-li");r.appendChild(el("div","nz-em",x[0]));
+ var t=el("div");t.appendChild(el("b",null,x[1]));t.appendChild(el("span",null,x[2]));r.appendChild(t);w.appendChild(r)});return w}
+function soon(text){var b=el("button","nz-btn",text);b.onclick=function(){toast("Скоро будет")};return b}
+
+function sPremium(b){b.appendChild(hero("star","#7b61ff",NZ+" Premium","Расширенные возможности для тех, кто пользуется "+NZ+" каждый день."));
+ b.appendChild(items([["📂","Больше чатов и папок","Закрепляй больше чатов и собирай их в папки."],["🚀","Быстрая загрузка","Фото и файлы грузятся без ограничений по скорости."],
+  ["🎨","Особые темы","Эксклюзивные темы, обои и иконки приложения."],["⭐","Значок рядом с именем","Все увидят, что ты с Premium."]]));
+ b.appendChild(soon("Подписаться — скоро"))}
+function sStars(b){b.appendChild(hero("star","#f0a030","Звёзды "+NZ,"Внутренняя валюта для подарков и платных функций."));
+ var c=el("div","nz-card");c.appendChild(el("div","nz-lab","Ваш баланс"));var v=el("div","nz-h","0 ★");v.style.padding="4px 0 14px";c.appendChild(v);b.appendChild(c);
+ b.appendChild(soon("Пополнить — скоро"))}
+function sBiz(b){b.appendChild(hero("shop","#e84855",NZ+" для бизнеса","Инструменты для тех, кто общается с клиентами."));
+ b.appendChild(items([["⚡","Быстрые ответы","Шаблоны сообщений в один тап."],["👋","Приветствие","Автоматически здоровайся с новыми клиентами."],
+  ["🌙","Режим «Нет на месте»","Автоответ, когда ты не в сети."],["🕘","Рабочие часы","Покажи, когда ты отвечаешь."]]));
+ b.appendChild(soon("Подключить — скоро"))}
+function sGift(b){b.appendChild(hero("gift","#f08a30","Отправить подарок","Порадуй друга подарком в "+NZ+"."));
+ var g=el("div","nz-grid");["🎁","🧸","🌹","🎂","💎","🏆"].forEach(function(e){var x=el("button","nz-gi",e);x.onclick=function(){toast("Подарки скоро будут")};g.appendChild(x)});b.appendChild(g)}
+function sAsk(b){b.appendChild(hero("chat","#f0a030","Задать вопрос","Напиши нам — волонтёры поддержки ответят, как только смогут."));
+ if(SUPPORT){var x=el("button","nz-btn","Написать в поддержку");x.onclick=function(){window.open(SUPPORT,"_blank","noopener")};b.appendChild(x)}
+ else b.appendChild(el("p","nz-p","Контакт поддержки пока не указан."))}
+function sFaq(b){var q=[
+ ["Как войти?","Открой бота в Telegram и нажми /start — он пришлёт твой номер. Введи номер на сайте, код входа придёт в бота."],
+ ["Номер настоящий?","Нет, это внутренний номер "+NZ+" вида +1 (555) …, он нужен только для входа."],
+ ["Как создать группу или канал?","На вкладке «Чаты» нажми «+» и выбери «Группа» или «Канал». В канале пишет только владелец."],
+ ["Как сменить фото и имя?","Вкладка «Профиль» → «Выбрать фото» или «Изменить»."],
+ ["Как найти человека?","Нажми на лупу на вкладке «Чаты» и введи имя, @username или номер."]];
+ var w=el("div","nz-card");q.forEach(function(x){var d=el("details","nz-q");d.appendChild(el("summary",null,x[0]));d.appendChild(el("p",null,x[1]));w.appendChild(d)});b.appendChild(w)}
+function sFeat(b){b.appendChild(items([["💬","Личные чаты","Переписка один на один."],["👥","Группы","Общайся с друзьями в одном чате."],["📢","Каналы","Публикуй новости — пишет только владелец."],
+ ["🔍","Поиск","По имени, @username и номеру."],["🎨","Оформление","Темы, обои и размер текста в настройках чатов."],["📌","Закрепление","Смахни чат влево, чтобы закрепить."]]))}
+function sPriv(b){var p=function(h,t){b.appendChild(el("div","nz-h",h));b.lastChild.style.fontSize="19px";b.lastChild.style.marginTop="14px";b.appendChild(el("p","nz-p",t))};
+ p("Какие данные мы храним","Внутренний номер, имя, фамилию, @username, «О себе», дату рождения, фото профиля, твои чаты и сообщения, а также данные о сеансах входа.");
+ p("Сообщения","Сообщения хранятся на сервере "+NZ+" и пока не имеют сквозного шифрования.");
+ p("Кому доступны данные","Мы не продаём данные и не передаём их рекламодателям. Другим пользователям видны имя, @username и фото профиля.");
+ p("Удаление","Чтобы удалить аккаунт и данные, напиши в поддержку.");
+ var n=el("p","nz-p","Это краткое описание. Отредактируй текст под свой проект.");n.style.fontStyle="italic";b.appendChild(n)}
+
+function build(){var w=el("div");w.setAttribute("data-nz","1");w.style.paddingBottom="20px";
+ var c1=el("div","nz-card");
+ c1.appendChild(row("star","#7b61ff",NZ+" Premium",function(){screen(NZ+" Premium",sPremium)}));
+ c1.appendChild(row("star","#f0a030","Звёзды "+NZ,function(){screen("Звёзды "+NZ,sStars)}));
+ c1.appendChild(row("shop","#e84855",NZ+" для бизнеса",function(){screen(NZ+" для бизнеса",sBiz)}));
+ c1.appendChild(row("gift","#f08a30","Отправить подарок",function(){screen("Отправить подарок",sGift)}));
+ var c2=el("div","nz-card");c2.appendChild(el("div","nz-lab","Помощь"));
+ c2.appendChild(row("chat","#f0a030","Задать вопрос",function(){screen("Задать вопрос",sAsk)}));
+ c2.appendChild(row("help","#1f9cf0","Вопросы о "+NZ,function(){screen("Вопросы о "+NZ,sFaq)}));
+ c2.appendChild(row("bulb","#a45be0","Возможности "+NZ,function(){screen("Возможности "+NZ,sFeat)}));
+ c2.appendChild(row("shield","#3ab54a","Политика конфиденциальности",function(){screen("Политика конфиденциальности",sPriv)}));
+ w.appendChild(c1);w.appendChild(c2);w.appendChild(el("div","nz-ver",NZ+" · версия 1.0"));return w}
+
+var busy=false;
+function inject(){busy=false;var box=document.getElementById("setBox");
+ if(!box||!box.firstChild||box.querySelector("[data-nz]"))return;box.appendChild(build())}
+new MutationObserver(function(){if(!busy){busy=true;requestAnimationFrame(inject)}}).observe(document.body,{childList:true,subtree:true});
+inject();
+})();
+
 </script></body></html>`;
