@@ -554,7 +554,7 @@ function digits(){return $("num").value.replace(/\D/g,"")}
 function fmt(d){d=d.slice(0,10);var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
  return (a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?"-"+c:"")}
 function phoneFull(){return "1"+digits()}
-$("num").addEventListener("input",function(){this.value=fmt(digits());$("err1").textContent="";$("next1").disabled=digits().length<10});
+$("num").addEventListener("input",function(){this.value=fmt(digits());$("err1").textContent="";$("next1").disabled=false});
 function cooldown(){$("resend").disabled=true;var s=30;clearInterval(timer);
  $("resend").textContent="Отправить ещё раз через "+s+" с";
  timer=setInterval(function(){s--;if(s<=0){clearInterval(timer);$("resend").disabled=false;$("resend").textContent="Отправить код ещё раз"}
