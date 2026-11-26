@@ -551,8 +551,7 @@ function full(m){return ((m.name||"")+" "+(m.last||"")).trim()||"Без имен
 var cur=["США","+1"],timer=null;
 function show(id){["s1","s2"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
 function digits(){return $("num").value.replace(/\D/g,"")}
-function fmt(d){d=d.slice(0,10);var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
- return (a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?"-"+c:"")}
+function fmt(d){d=d.slice(0,10);var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);return (a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?"-"+c:"")}
 function phoneFull(){return "1"+digits()}
 $("num").addEventListener("input",function(){this.value=fmt(digits());$("err1").textContent="";$("next1").disabled=false});
 function cooldown(){$("resend").disabled=true;var s=30;clearInterval(timer);
