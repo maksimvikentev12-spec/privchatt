@@ -1054,4 +1054,22 @@ setInterval(function(){if(CFG.auto)applyCfg()},60000);
 buildNav();
 if(T){api("GET","/api/me").then(function(m){if(m&&!m.error)enterApp()})}
 </script><script>/*PH-FIX*/(function(){var n=document.getElementById("num");if(!n)return;n.addEventListener("input",function(){var d=n.value.replace(/[^0-9]/g,"").slice(0,10),a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);var v=(a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?" "+c:"");if(n.value!==v)n.value=v})})();</script>
+<script>/*NZ-MOVE*/
+(function(){
+var map={},order=[],busy=false,tries=0;
+function fixText(n){var w=document.createTreeWalker(n,NodeFilter.SHOW_TEXT),t;while(t=w.nextNode()){if(t.nodeValue.indexOf("Telegram")>-1)t.nodeValue=t.nodeValue.replace(/Telegram/g,"NazeGram")}}
+function isBlock(c){var t=c.textContent||"";return t.indexOf("Телефон")<0&&t.indexOf("Имя пользователя")<0&&/Premium|Звёзды|для бизнеса|Отправить подарок|Помощь|Задать вопрос/.test(t)}
+function run(){
+ var p=document.getElementById("profBox");
+ if(p)Array.prototype.slice.call(p.children).forEach(function(c){
+  if(c.getAttribute("data-nzm")||!isBlock(c))return;
+  var k=(c.textContent||"").slice(0,40);
+  if(!map[k]){c.setAttribute("data-nzm","1");map[k]=c;order.push(k);fixText(c)}
+  c.parentNode.removeChild(c)});
+ var s=document.getElementById("setBox");
+ if(s&&s.firstChild&&order.length)order.forEach(function(k){var n=map[k];if(n.parentNode!==s)s.appendChild(n)})}
+new MutationObserver(function(){if(!busy){busy=true;requestAnimationFrame(function(){busy=false;run()})}}).observe(document.body,{childList:true,subtree:true});
+setInterval(function(){run();if(!order.length&&tries<20&&typeof T!=="undefined"&&T&&typeof loadProfile==="function"){tries++;try{loadProfile()}catch(e){}}},2000);
+})();
+</script>
 </body></html>`;
