@@ -267,7 +267,7 @@ poll();
 const PAGE = String.raw`<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark"><title>Приватка</title><link rel="icon" id="fav" href="data:,">
+<meta name="color-scheme" content="dark"><title>NuzaGram</title><link rel="icon" id="fav" href="data:,">
 <style>
 :root{--bg:#181818;--field:#1e1e1e;--card:#232323;--line:#4a4a4a;--text:#f2f2f2;--mute:#8a8a8a;--accent:#86b055;--mine:#3d5a2a;--err:#e0685f;--fs:16px;--br:17px;--wall:#181818;--nav:#222;--navon:#2c3626;--sheet:#202020;--bd:#333}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -426,7 +426,8 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px;margin:6px 0
 .swr .under{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:24px;font-weight:600;color:#fff}
 .swr .row{background:var(--bg);position:relative;transition:transform .2s}
 .webbar{display:flex;align-items:center;gap:10px;padding:10px 12px}
-</style></head><body>
+</style><link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/style.css">
+</head><body>
 
 <section class="screen on" id="s1">
  <button class="back" aria-label="Назад">←</button>
@@ -449,7 +450,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px;margin:6px 0
 
 <div id="app">
  <section class="tab on" id="tChats">
-  <div class="top" id="topNormal"><h2>Приватка</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
+  <div class="top" id="topNormal"><h2>NuzaGram</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
   <div class="top hide" id="topSearch"><button class="ico" id="sBack" aria-label="Закрыть поиск"></button><input class="sbox" id="sInp" placeholder="Поиск людей, групп и каналов" autocomplete="off"></div>
   <div class="scroll" id="chatList"></div>
   <div class="scroll hide" id="searchRes"></div>
