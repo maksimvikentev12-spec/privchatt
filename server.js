@@ -1,4 +1,4 @@
-// NuzaGram: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
+// Приватка: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
 // Запуск: BOT_TOKEN=токен_от_BotFather node server.js
 const http = require('http'), fs = require('fs'), crypto = require('crypto');
 
@@ -268,7 +268,7 @@ poll();
 const PAGE = String.raw`<!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark"><title>NuzaGram</title><link rel="icon" id="fav" href="data:,">
+<meta name="color-scheme" content="dark"><title>Приватка</title><link rel="icon" id="fav" href="data:,">
 <style>
 :root{--bg:#181818;--field:#1e1e1e;--card:#232323;--line:#4a4a4a;--text:#f2f2f2;--mute:#8a8a8a;--accent:#86b055;--mine:#3d5a2a;--err:#e0685f;--fs:16px;--br:17px;--wall:#181818;--nav:#222;--navon:#2c3626;--sheet:#202020;--bd:#333}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -450,7 +450,7 @@ input[type=range]{width:100%;accent-color:var(--accent);height:30px;margin:6px 0
 
 <div id="app">
  <section class="tab on" id="tChats">
-  <div class="top" id="topNormal"><h2>NuzaGram</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
+  <div class="top" id="topNormal"><h2>Приватка</h2><button class="ico" id="sBtn" aria-label="Поиск"></button></div>
   <div class="top hide" id="topSearch"><button class="ico" id="sBack" aria-label="Закрыть поиск"></button><input class="sbox" id="sInp" placeholder="Поиск людей, групп и каналов" autocomplete="off"></div>
   <div class="scroll" id="chatList"></div>
   <div class="scroll hide" id="searchRes"></div>
@@ -551,9 +551,10 @@ function full(m){return ((m.name||"")+" "+(m.last||"")).trim()||"Без имен
 var cur=["США","+1"],timer=null;
 function show(id){["s1","s2"].forEach(function(s){$(s).classList.toggle("on",s===id)})}
 function digits(){return $("num").value.replace(/\D/g,"")}
-function fmt(d){d=d.slice(0,10);var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);return (a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?"-"+c:"")}
+function fmt(d){d=d.slice(0,10);var a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);
+ return (a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?"-"+c:"")}
 function phoneFull(){return "1"+digits()}
-$("num").addEventListener("input",function(){this.value=fmt(digits());$("err1").textContent="";$("next1").disabled=false});
+$("num").addEventListener("input",function(){this.value=fmt(digits());$("err1").textContent="";$("next1").disabled=digits().length<10});
 function cooldown(){$("resend").disabled=true;var s=30;clearInterval(timer);
  $("resend").textContent="Отправить ещё раз через "+s+" с";
  timer=setInterval(function(){s--;if(s<=0){clearInterval(timer);$("resend").disabled=false;$("resend").textContent="Отправить код ещё раз"}
@@ -652,7 +653,7 @@ function loadProfile(){loadMe(function(m){if(!m||m.error)return;var b=$("profBox
  var hero=h("div","hero");hero.appendChild(ava(full(m),m.avId));hero.appendChild(h("h3",null,full(m)));hero.appendChild(h("p",null,"в сети"));b.appendChild(hero);
  var acts=h("div","acts");
  [["cam","Выбрать фото",pickPhoto],["pen","Изменить",openAcc],["gear","Настройки",function(){setTab("tSettings")}]].forEach(function(a){
-  var bt=h("button");var s=h("span");s.innerHTML=ic(a[0],26);bt.appendChild(s);bt.appendChild(document.createTextNode(a[1]));bt.onclick=a[2];bt.onclick = a[2]; acts.appendChild(bt)});
+  var bt=h("button");var s=h("span");s.innerHTML=ic(a[0],26);bt.appendChild(s);bt.appendChild(document.createTextNode(a[1]));bt.onclick=a[2];acts.appendChild(bt)});
  b.appendChild(acts);
  var card=h("div","card");card.appendChild(kv(m.phone,"Телефон"));
  card.appendChild(kv(m.username?"@"+m.username:"Не указано","Имя пользователя"));
@@ -660,9 +661,39 @@ function loadProfile(){loadMe(function(m){if(!m||m.error)return;var b=$("profBox
  if(m.bio)card.appendChild(kv(m.bio,"О себе"));
  b.appendChild(card);
   
+  var pr = h("div", "card");
+  pr.innerHTML = '<div class="srow"><div class="si" style="background:#8e7cc3">⭐</div><div class="rb"><div class="rt">Telegram Premium</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f0a030">🌟</div><div class="rb"><div class="rt">Звёзды Telegram</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#e85a5a">🏪</div><div class="rb"><div class="rt">Telegram для бизнеса</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f08a30">🎁</div><div class="rb"><div class="rt">Отправить подарок</div></div></div>';
+  pr.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(pr);
+
+  var hlp = h("div", "card");
+  hlp.innerHTML = '<div style="color:var(--accent);font-size:14px;padding:14px 0 4px">Помощь</div>' +
+                  '<div class="srow"><div class="si" style="background:#f0a030">💬</div><div class="rb"><div class="rt">Задать вопрос</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#5ca1e6">❓</div><div class="rb"><div class="rt">Вопросы о Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#a45be0">💡</div><div class="rb"><div class="rt">Возможности Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#3ab54a">🛡️</div><div class="rb"><div class="rt">Политика конфиденциальности</div></div></div>';
+  hlp.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(hlp);
   
-  
-  
+  var pr = h("div", "card");
+  pr.innerHTML = '<div class="srow"><div class="si" style="background:#8e7cc3">⭐</div><div class="rb"><div class="rt">Telegram Premium</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f0a030">🌟</div><div class="rb"><div class="rt">Звёзды Telegram</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#e85a5a">🏪</div><div class="rb"><div class="rt">Telegram для бизнеса</div></div></div>' +
+                 '<div class="srow"><div class="si" style="background:#f08a30">🎁</div><div class="rb"><div class="rt">Отправить подарок</div></div></div>';
+  pr.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(pr);
+
+  var hlp = h("div", "card");
+  hlp.innerHTML = '<div style="color:var(--accent);font-size:14px;padding:14px 0 4px">Помощь</div>' +
+                  '<div class="srow"><div class="si" style="background:#f0a030">💬</div><div class="rb"><div class="rt">Задать вопрос</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#5ca1e6">❓</div><div class="rb"><div class="rt">Вопросы о Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#a45be0">💡</div><div class="rb"><div class="rt">Возможности Telegram</div></div></div>' +
+                  '<div class="srow"><div class="si" style="background:#3ab54a">🛡️</div><div class="rb"><div class="rt">Политика конфиденциальности</div></div></div>';
+  hlp.querySelectorAll(".srow").forEach(function(el){ el.onclick = function(){ toast("В разработке") } });
+  b.appendChild(hlp);
   
   // Telegram Premium и остальное
   
@@ -1022,7 +1053,5 @@ setInterval(function(){if(CFG.auto)applyCfg()},60000);
 /* старт */
 buildNav();
 if(T){api("GET","/api/me").then(function(m){if(m&&!m.error)enterApp()})}
-
-})();
-
-</script></body></html>`;
+</script><script>/*PH-FIX*/(function(){var n=document.getElementById("num");if(!n)return;n.addEventListener("input",function(){var d=n.value.replace(/[^0-9]/g,"").slice(0,10),a=d.slice(0,3),b=d.slice(3,6),c=d.slice(6);var v=(a?"("+a+(a.length===3?")":""):"")+(b?" "+b:"")+(c?" "+c:"");if(n.value!==v)n.value=v})})();</script>
+</body></html>`;
