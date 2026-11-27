@@ -1,4 +1,3 @@
-// Приватка: сервер + бот + сайт в одном файле. Нужен Node.js 18+.
 // Запуск: BOT_TOKEN=токен_от_BotFather node server.js
 const http = require('http'), fs = require('fs'), crypto = require('crypto');
 
